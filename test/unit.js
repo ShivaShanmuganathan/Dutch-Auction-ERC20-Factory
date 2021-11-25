@@ -100,12 +100,12 @@ describe("DutchAuction", function () {
     
       let auctionDetails = await auctionContract.auctionDetails(1);
       let result = transformAuctionDetails(auctionDetails);
-      console.log(result);
+      // console.log(result);
       expect(result.endDate - result.startDate).to.be.at.most(3600);
       expect(result.startPrice).to.be.equal('1.0');
       expect(result.biddingPrice).to.be.equal('1.0');
       expect(result.reservePrice).to.be.equal('0.5');
-      console.log(result.totalTokens);
+      // console.log(result.totalTokens);
       // expect(result.totalTokens).to.be.equal(ethers.utils.parseEther("2000"));
       // expect(result.remainingTokens).to.be.equal(ethers.utils.parseEther("2000"));
       
@@ -116,7 +116,7 @@ describe("DutchAuction", function () {
 
       let auctionDetails2 = await auctionContract.auctionDetails(2);
       let result2 = transformAuctionDetails(auctionDetails2);
-      console.log(result2);
+      // console.log(result2);
       expect(result2.endDate - result2.startDate).to.be.at.most(1800);
       expect(result2.startPrice).to.be.equal('1.0');
       expect(result2.biddingPrice).to.be.equal('1.0');
@@ -192,8 +192,51 @@ describe("DutchAuction", function () {
 
     it("Should check if only nonAuctionOwners can access this bid", async function () { 
 
+      await expect(auctionContract.connect(owner).createBid(1, 10)).to.be.revertedWith('Auction Owner cannot make a bid');
+      await expect(auctionContract.connect(addr1).createBid(1, 10)).to.not.be.revertedWith('Auction Owner cannot make a bid');
 
     });
+
+    it("Should check if auction is live", async function () { 
+
+      expect(transformAuctionDetails(await auctionContract.connect(owner).auctionDetails(1)).auctionComplete).to.be.false;
+      //await expect(auctionContract.connect(addr1).createBid(1, 10)).to.not.be.revertedWith('Auction Owner cannot make a bid');
+
+    });
+
+    it("Should check if bidder has any previous bids in this auction", async function () { 
+      
+      expect(await auctionContract.reservedTokens(addr1.address,1)).to.be.equal(0);
+
+    });
+
+    //check if auction has sufficient tokens for bidder
+    it("Should check if auction has sufficient tokens for bidder", async function () { 
+
+      expect(transformAuctionDetails(await auctionContract.auctionDetails(1)).remainingTokens).to.not.be.equal(0);
+
+    });
+
+    it("Should create bid with adddress 1", async function () {
+      let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(1)));
+      let token_amount = 10;
+      let cost = (price * token_amount).toString();
+      console.log(cost);
+
+      await auctionContract.connect(addr1).createBid(1, 10, {value: ethers.utils.parseEther(cost)});
+      //await expect(auctionContract.connect(addr1).createBid(1, 10)).to.not.be.revertedWith('Auction Owner cannot make a bid');
+
+    });
+
+    it("Check bidders list", async function () { 
+
+      console.log((await auctionContract.bidIDList(addr1.address,1)).toNumber());
+      console.log((await auctionContract.biddersList(1,1)));
+      console.log(addr1.address);
+    });
+
+
+
 
 
   });
