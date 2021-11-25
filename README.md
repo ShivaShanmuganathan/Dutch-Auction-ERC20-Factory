@@ -13,7 +13,7 @@ FUNCTION TO BE TESTED:
   - check if auction is live
   - verify auction details
   - verify auctionOwner
-  - transfer minted tokens to contract
+  - check if erc20 tokens are transferred to contract
   - verify event
 - TOTAL AUCTIONS
   - verify auctionID
