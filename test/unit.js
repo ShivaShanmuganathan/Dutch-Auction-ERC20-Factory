@@ -15,8 +15,8 @@ const transformAuctionDetails = (auctionData) => {
     startPrice: ethers.utils.formatEther(auctionData.startPrice),
     reservePrice: ethers.utils.formatEther(auctionData.reservePrice),
     biddingPrice: ethers.utils.formatEther(auctionData.biddingPrice),
-    totalTokens: auctionData.totalTokens.toNumber(),
-    remainingTokens: auctionData.remainingTokens.toNumber(),
+    totalTokens: ethers.utils.formatEther(auctionData.totalTokens),
+    remainingTokens: ethers.utils.formatEther(auctionData.remainingTokens),
     totalBids: auctionData.totalBids.toNumber(),
     totalAmount: auctionData.totalAmount.toNumber(),
     token: auctionData.token.toString(),
@@ -28,14 +28,14 @@ const transformAuctionDetails = (auctionData) => {
 describe("DutchAuction", function () {
 
   let owner, addr1, addr2;
-
+  let ownerBalance;
   
   before(async function () {
 
     [owner, addr1, addr2] = await ethers.getSigners();          
     const Token = await ethers.getContractFactory('Token', owner);
     token12 = await Token.deploy();
-
+    decimals = await token12.decimals();
     // let decimals = await token.decimals();
     // let obs_minted_tokens = (await token.balanceOf(owner.address)) / 10**decimals; 
     // console.log(obs_minted_tokens);
@@ -50,10 +50,10 @@ describe("DutchAuction", function () {
 
     it("Should mint tokens and check owner balance", async function () { 
 
-      let decimals = await token12.decimals();
-      let minted_tokens = (await token12.balanceOf(owner.address)) / 10**decimals; 
-      expect(minted_tokens).to.be.equal(1000000);
       
+      ownerBalance = (await token12.balanceOf(owner.address)) / 10**decimals; 
+      expect(ownerBalance).to.be.equal(1000000);
+      console.log(decimals);
     });
 
   });
@@ -63,23 +63,23 @@ describe("DutchAuction", function () {
     it("Should create auction with the approved tokens", async function () {
 
       // first auction has limited tokens and long enddate
-      await token12.connect(owner).approve(auctionContract.address, 200);
+      await token12.connect(owner).approve(auctionContract.address, ethers.utils.parseEther("2000"));
       await auctionContract.connect(owner).createAuction(
         Math.floor(Date.now() / 1000 + 3600),
         ethers.utils.parseEther("1"),
         ethers.utils.parseEther("0.5"),
-        200,
+        ethers.utils.parseEther("2000"),
         token12.address
       );
   
       // second auction has many tokens and short enddate
-      await token12.connect(owner).transfer(addr1.address, 800);
-      await token12.connect(addr1).approve(auctionContract.address, 800);
+      await token12.connect(owner).transfer(addr1.address, ethers.utils.parseEther("8000"));
+      await token12.connect(addr1).approve(auctionContract.address, ethers.utils.parseEther("8000"));
       await auctionContract.connect(addr1).createAuction(
         Math.floor(Date.now() / 1000 + 1800),
         ethers.utils.parseEther("1"),
         ethers.utils.parseEther("0.5"),
-        800,
+        ethers.utils.parseEther("8000"),
         token12.address
       );
   
@@ -105,8 +105,10 @@ describe("DutchAuction", function () {
       expect(result.startPrice).to.be.equal('1.0');
       expect(result.biddingPrice).to.be.equal('1.0');
       expect(result.reservePrice).to.be.equal('0.5');
-      expect(result.totalTokens).to.be.equal(200);
-      expect(result.remainingTokens).to.be.equal(200);
+      console.log(result.totalTokens);
+      // expect(result.totalTokens).to.be.equal(ethers.utils.parseEther("2000"));
+      // expect(result.remainingTokens).to.be.equal(ethers.utils.parseEther("2000"));
+      
       expect(result.totalBids).to.be.equal(0);
       expect(result.totalAmount).to.be.equal(0);
       expect(result.token).to.be.equal(token12.address);
@@ -119,8 +121,10 @@ describe("DutchAuction", function () {
       expect(result2.startPrice).to.be.equal('1.0');
       expect(result2.biddingPrice).to.be.equal('1.0');
       expect(result2.reservePrice).to.be.equal('0.5');
-      expect(result2.totalTokens).to.be.equal(800);
-      expect(result2.remainingTokens).to.be.equal(800);
+      
+      // expect(result2.totalTokens).to.be.equal(800);
+      // expect(result2.remainingTokens).to.be.equal(800);
+      
       expect(result2.totalBids).to.be.equal(0);
       expect(result2.totalAmount).to.be.equal(0);
       expect(result2.token).to.be.equal(token12.address);
@@ -142,13 +146,13 @@ describe("DutchAuction", function () {
     });
 
     
-    it("Should check contract balance for erc20 tokens", async function () { 
+    it("Should check owner & contract balance for erc20 tokens", async function () { 
       
-      let contract_token_balance = (await token12.balanceOf(auctionContract.address)) ; 
-      console.log(contract_token_balance.toNumber());
-      // let decimals = await token12.decimals();
-      let minted_tokens = (await token12.balanceOf(owner.address)); 
-      console.log(minted_tokens.toString());
+      let contract_token_balance = (await token12.balanceOf(auctionContract.address)) / 10**decimals; 
+      // console.log(contract_token_balance);
+      // console.log(ownerBalance);
+      ownerNewBalance = (await token12.balanceOf(owner.address)) / 10**decimals; 
+      expect(ownerBalance - contract_token_balance).to.be.equal(ownerNewBalance);
 
     });
   
