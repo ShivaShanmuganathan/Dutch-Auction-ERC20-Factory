@@ -63,23 +63,23 @@ describe("DutchAuction", function () {
     it("Should create auction with the approved tokens", async function () {
 
       // first auction has limited tokens and long enddate
-      await token12.connect(owner).approve(auctionContract.address, ethers.utils.parseEther("2000"));
+      await token12.connect(owner).approve(auctionContract.address, ethers.utils.parseEther("20"));
       await auctionContract.connect(owner).createAuction(
         Math.floor(Date.now() / 1000 + 3600),
         ethers.utils.parseEther("1"),
         ethers.utils.parseEther("0.5"),
-        ethers.utils.parseEther("2000"),
+        ethers.utils.parseEther("20"),
         token12.address
       );
   
       // second auction has many tokens and short enddate
-      await token12.connect(owner).transfer(addr1.address, ethers.utils.parseEther("8000"));
-      await token12.connect(addr1).approve(auctionContract.address, ethers.utils.parseEther("8000"));
+      await token12.connect(owner).transfer(addr1.address, ethers.utils.parseEther("80"));
+      await token12.connect(addr1).approve(auctionContract.address, ethers.utils.parseEther("80"));
       await auctionContract.connect(addr1).createAuction(
         Math.floor(Date.now() / 1000 + 1800),
         ethers.utils.parseEther("1"),
         ethers.utils.parseEther("0.5"),
-        ethers.utils.parseEther("8000"),
+        ethers.utils.parseEther("80"),
         token12.address
       );
   
@@ -155,41 +155,46 @@ describe("DutchAuction", function () {
       expect(ownerBalance - contract_token_balance).to.be.equal(ownerNewBalance);
 
     });
+
   
-    it("Should check decrease in auction price", async function () { 
+    // it("Should check decrease in auction price", async function () { 
   
+    //   console.log((await auctionContract.currentPrice(1)).toString());
+    //   const timeNow = (await auctionContract.checkTime()).toNumber();
+    //   console.log(timeNow);
       
-      console.log((await auctionContract.currentPrice(1)).toString());
-      const timeNow = (await auctionContract.checkTime()).toNumber();
-      console.log(timeNow);
+    //   await ethers.provider.send('evm_increaseTime', [1800]);
+    //   await ethers.provider.send('evm_mine');
+    //   console.log((await auctionContract.currentPrice(1)).toString());
+
+    //   await ethers.provider.send('evm_increaseTime', [900]);
+    //   await ethers.provider.send('evm_mine');
+    //   console.log((await auctionContract.currentPrice(1)).toString());
+    //   console.log((await auctionContract.currentPrice(2)).toString());
+  
+    // });
+  
+    // it("Should check reserve price", async function () { 
+  
+    //   console.log((await auctionContract.checkTime()).toString());
+    //   console.log((await auctionContract.currentPrice(1)).toString());
+    //   await ethers.provider.send('evm_increaseTime', [176]);
+    //   await ethers.provider.send('evm_mine');
+    //   console.log((await auctionContract.checkTime()).toString());
+    //   console.log((await auctionContract.currentPrice(1)).toString());
       
-      await ethers.provider.send('evm_increaseTime', [1800]);
-      await ethers.provider.send('evm_mine');
-      console.log((await auctionContract.currentPrice(1)).toString());
-      await ethers.provider.send('evm_increaseTime', [900]);
-      await ethers.provider.send('evm_mine');
-      console.log((await auctionContract.currentPrice(1)).toString());
-      console.log((await auctionContract.currentPrice(2)).toString());
+    // });
   
-      // await ethers.provider.send('evm_setNextBlockTimestamp', [timeNow + 3600]);
-      // await ethers.provider.send('evm_mine');
-      // console.log((await auctionContract.checkTime()).toString());
-      // console.log(ethers.utils.formatEther(await auctionContract.currentPrice(1)));
-  
-  
+
+  });
+
+  describe("CREATE BID ()", function () { 
+
+    it("Should check if only nonAuctionOwners can access this bid", async function () { 
+
+
     });
-  
-    it("Should check reserve price", async function () { 
-  
-      // console.log((await auctionContract.checkTime()).toString());
-      // console.log((await auctionContract.currentPrice(1)).toString());
-      // await ethers.provider.send('evm_increaseTime', [176]);
-      // await ethers.provider.send('evm_mine');
-      // console.log((await auctionContract.checkTime()).toString());
-      // console.log((await auctionContract.currentPrice(1)).toString());
-      
-    });
-  
+
 
   });
 
