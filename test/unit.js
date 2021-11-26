@@ -149,8 +149,7 @@ describe("DutchAuction", function () {
     });
 
     it("Should create 1st bid in auction 1 with adddress 1 & check the created bid details", async function () {
-      // let contractTokenBalance = (await token1.balanceOf(auctionContract.address)) / 10**decimals; 
-      // console.log(contractTokenBalance);
+      
       let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(1)));
       let requestTokens = 10;
       let cost = (price * requestTokens).toString();
@@ -300,9 +299,7 @@ describe("DutchAuction", function () {
         80,
         token1.address
       );
-      let auctionDetails2 = await auctionContract.auctionDetails(2);
-      let result2 = transformAuctionDetails(auctionDetails2);
-      console.log(result2);
+      
   
     });
 
