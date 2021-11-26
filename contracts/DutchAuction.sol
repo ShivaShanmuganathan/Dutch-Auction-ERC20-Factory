@@ -30,19 +30,33 @@ contract DutchAuction is Ownable{
 
     uint256 auctionID;
     
-    // Maps user address to auctionID to reservedTokens;
+    // Maps userAddress to auctionID to reservedTokens;
     mapping (address => mapping (uint256 => uint256)) public reservedTokens;
+
+    // Maps userAddress to auctionID to monetDeposited;
     mapping (address => mapping (uint256 => uint256)) public moneyDeposited;
+
+    // Maps userAddress to auctionID to bidID;
     mapping (address => mapping (uint256 => uint256)) public bidIDList;
+
+    // Maps auctionID to bidID to userAddress;
     mapping (uint256 => mapping (uint256 => address)) public biddersList;
-    
-    // bidList[msg.sender][_auctionID] = bidID;
+
+    // Maps auctionOwnerAddress to auctionID
     mapping (address => uint256) public auctionOwner;
+
+    // Maps auctionID to auctionDetails
     mapping (uint256 => Auction) public auctionDetails;
     
+    // event to denote auction creation
     event AuctionCreated(uint256 auctionID, uint256 totalTokens, address tokenAddress);
+
+    // event to denote bid creation
     event BidCreated(uint256 bidID, uint256 auctionID, address bidder, uint256 amount, uint256 price, uint256 remainingTokens);
     
+    // event to denote end of auction
+    event auctionEnded(uint256 auctionID);
+
     
     function createAuction(
         uint256 _endDate,
@@ -68,31 +82,12 @@ contract DutchAuction is Ownable{
             token : _token,
             auctionComplete: false
         });
-        // auctionDetails[auctionID].startDate = block.timestamp;
-        // auctionDetails[auctionID].endDate = auctionDetails[auctionID].startDate + _endDate;
-        // auctionDetails[auctionID].startPrice = _startPrice;
-        // auctionDetails[auctionID].reservePrice = _reservePrice;
-        // auctionDetails[auctionID].totalTokens = _totalTokens;
-        // auctionDetails[auctionID].remainingTokens = _totalTokens;
-        // auctionDetails[auctionID].token = _token;
+
         auctionOwner[msg.sender] = auctionID;
         IERC20(_token).transferFrom(msg.sender, address(this), _totalTokens * 10**18);
         
-        // auctionDetails[auctionID].token.transferFrom(msg.sender, address(this), _totalTokens);
-        //transferToContract(msg.sender, _token, _totalTokens);
-        
         emit AuctionCreated(auctionID, _totalTokens, _token);
-        //return auctionID;
     }
-    
-    function totalAuctions() 
-    public 
-    view 
-    returns (uint256)
-    {
-        return auctionID;
-    }
-    
     
     function currentPrice(uint256 _auctionID) 
     public 
@@ -111,23 +106,11 @@ contract DutchAuction is Ownable{
 
     }
 
-    // uint256 elapse = block.timestamp - auctionDetails[_auctionID].startDate;
-    // uint256 calculated = (elapse * 100) / (auctionDetails[_auctionID].endDate - auctionDetails[_auctionID].startDate);
-    // uint256 deduction = (calculated * auctionDetails[_auctionID].startPrice) / 100;
-    // uint256 currPrice = auctionDetails[_auctionID].startPrice - deduction;
-    // if (currPrice < auctionDetails[_auctionID].reservePrice) {
-    //     currPrice = auctionDetails[_auctionID].reservePrice;
-    // }
-    // return currPrice;
-    
-    
     function createBid(uint256 _auctionID, uint256 _amount) 
     payable
     external
     onlyNonAuctionOwners(_auctionID)
     {
-        // Check if auction is still on-going
-        
         require(auctionDetails[_auctionID].auctionComplete == false, "Auction is over");
         require(reservedTokens[msg.sender][_auctionID] == 0, "One can only bid once");
         require(_amount <= auctionDetails[_auctionID].remainingTokens, "Auction does not have sufficient tokens");
@@ -145,15 +128,14 @@ contract DutchAuction is Ownable{
         biddersList[_auctionID][bidID] = msg.sender;
 
         emit BidCreated(bidID, _auctionID, msg.sender, _amount, price, auctionDetails[_auctionID].remainingTokens);
+
     }
 
     function endAuction(uint256 _auctionID) 
     external
     onlyAuctionOwners(_auctionID) 
     {
-        // check if auction is still on-going
-        // bool auctionComplete = true
-        // require(auctionComplete == false, "Auction was ended");
+
         require(auctionDetails[_auctionID].auctionComplete == false, "Auction is over");
         if (auctionDetails[_auctionID].remainingTokens == 0) {
             
@@ -181,13 +163,12 @@ contract DutchAuction is Ownable{
             ownerWithdrawBalance = 0;
             auctionOwner[msg.sender] = 0;
             auctionDetails[_auctionID].auctionComplete = true;
+            emit auctionEnded(_auctionID);
 
         }
         else if (block.timestamp > auctionDetails[_auctionID].endDate) {
 
             uint256 bidding_price = auctionDetails[_auctionID].biddingPrice;
-            // change to reservePrice if auction owner should only receive the reserve price for tokens
-            // uint256 bidding_price = auctionDetails[_auctionID].reservePrice;
             address tokenAddress = auctionDetails[_auctionID].token;
             for (uint i = 1; i<=auctionDetails[_auctionID].totalBids; i++){
                 
@@ -212,6 +193,7 @@ contract DutchAuction is Ownable{
             ownerWithdrawBalance = 0;
             auctionOwner[msg.sender] = 0;
             auctionDetails[_auctionID].auctionComplete = true;
+            emit auctionEnded(_auctionID);
         }
 
         else {
@@ -220,15 +202,7 @@ contract DutchAuction is Ownable{
         
     }
 
-    function checkTime()
-    public
-    view 
-    returns (uint256) {
-
-        return block.timestamp;
-
-    }
-
+    // modifier to allow only auction owners to access the function
     modifier onlyAuctionOwners(uint256 _auctionID){
 
         require(auctionOwner[msg.sender] == _auctionID, "You are not the Auction Owner");
@@ -236,6 +210,7 @@ contract DutchAuction is Ownable{
 
     }
 
+    // modifier to allow only non-auction-owners to access the function
     modifier onlyNonAuctionOwners(uint256 _auctionID){
 
         require(auctionOwner[msg.sender] != _auctionID, "Auction Owner cannot make a bid");

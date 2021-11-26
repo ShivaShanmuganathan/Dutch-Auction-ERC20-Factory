@@ -44,7 +44,7 @@ FUNCTION TO BE TESTED:
       - check if erc20 has been transferred to respective accounts
       - check if owner receives the balance eth
       - check if auction is complete
-    - ONE WITH REMAINING TOKENS BUT PAST ENDDATE
+    - ONE WITH REMAINING TOKENS BUT PAST ENDDATE - [PRICE = RESERVE PRICE, AFTER ENDDATE]
       - check if auction has remaining tokens
       - check if erc20 has been transferred from smart contract
       - check if erc20 has been transferred to respective account
