@@ -52,7 +52,7 @@ describe("DutchAuction", function () {
       
       ownerBalance = (await token1.balanceOf(owner.address)) / 10**decimals; 
       expect(ownerBalance).to.be.equal(1000000);
-      console.log(decimals);
+      // console.log(decimals);
     });
 
   });
@@ -99,7 +99,7 @@ describe("DutchAuction", function () {
     
       let auctionDetails = await auctionContract.auctionDetails(1);
       let result = transformAuctionDetails(auctionDetails);
-      console.log(result);
+      // console.log(result);
       expect(result.endDate - result.startDate).to.be.at.most(3600);
       expect(result.startPrice).to.be.equal('1.0');
       expect(result.biddingPrice).to.be.equal('1.0');
@@ -198,7 +198,7 @@ describe("DutchAuction", function () {
 
     it("Should create 1st bid in auction 1 with adddress 1 & check the created bid details", async function () {
       let contractTokenBalance = (await token1.balanceOf(auctionContract.address)) / 10**decimals; 
-      console.log(contractTokenBalance);
+      // console.log(contractTokenBalance);
       let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(1)));
       let requestTokens = 10;
       let cost = (price * requestTokens).toString();
@@ -317,11 +317,16 @@ describe("DutchAuction", function () {
       expect(contractTokenBalanceAfter).to.be.lessThan(contractTokenBalanceBefore);
       expect(addr1TokenBalanceAfter).to.be.greaterThan(addr1TokenBalanceBefore);
       expect(addr2TokenBalanceAfter).to.be.greaterThan(addr2TokenBalanceBefore);
-
-      // CHECKING IF THE AUCTION IS LIVE
+      
+      // CHECKING COMPLETED AUCTION DETAILS
       let auctionDetails = await auctionContract.auctionDetails(1);
-      let auctionComplete = transformAuctionDetails(auctionDetails).auctionComplete;  
-      expect(auctionComplete).to.be.true;
+      let auctionData = transformAuctionDetails(auctionDetails);  
+      expect(auctionData.remainingTokens).to.be.equal(0);
+      expect(auctionData.totalAmount).to.be.equal('0.0');
+      // CHECKING IF THE AUCTION IS COMPLETED
+      expect(auctionData.auctionComplete).to.be.true;
+      
+      
 
     });
 
