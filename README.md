@@ -38,10 +38,10 @@ FUNCTION TO BE TESTED:
   - END AUCTION
   - USE 2 AUCTIONS
     - ONE WITH NO REMAINING TOKENS 
-      - check if erc20 has been transferred from smart contract
-      - check if erc20 has been transferred to respective account
       - check if refund eth has been transferred from smart contract
-      - check if refund eth has been transferred to respective account
+      - check if refund eth has been transferred to respective accounts
+      - check if erc20 has been transferred from smart contract
+      - check if erc20 has been transferred to respective accounts
       - check if owner receives the balance eth
       - check if auction is complete
     - ONE WITH REMAINING TOKENS BUT PAST ENDDATE

@@ -13,21 +13,21 @@ const { BigNumber } = require("ethers");
 async function main() {
   [owner, addr1, addr2] = await ethers.getSigners();          
   const Token = await ethers.getContractFactory('Token', owner);
-  token12 = await Token.deploy();
+  token1 = await Token.deploy();
 
   DutchAuction = await ethers.getContractFactory('DutchAuction', owner);
   auctionContract = await DutchAuction.deploy();
   console.log(auctionContract.address);
   await auctionContract.deployed();
 
-  await token12.connect(owner).approve(auctionContract.address, 1000);
+  await token1.connect(owner).approve(auctionContract.address, 1000);
     
   await auctionContract.connect(owner).createAuction(
     Math.floor(Date.now() / 1000 + 3600),
     ethers.utils.parseEther("1"),
     ethers.utils.parseEther("0.5"),
     500,
-    token12.address
+    token1.address
   );
   console.log((await auctionContract.currentPrice(1)).toString());
   await ethers.provider.send('evm_increaseTime', [1800]);

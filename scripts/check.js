@@ -33,7 +33,7 @@ describe("DutchAuction", function () {
 
     [owner, addr1, addr2] = await ethers.getSigners();          
     const Token = await ethers.getContractFactory('Token', owner);
-    token12 = await Token.deploy();
+    token1 = await Token.deploy();
 
     // let decimals = await token.decimals();
     // let obs_minted_tokens = (await token.balanceOf(owner.address)) / 10**decimals; 
@@ -49,8 +49,8 @@ describe("DutchAuction", function () {
 
     it("Should mint tokens and check owner balance", async function () { 
 
-      let decimals = await token12.decimals();
-      let minted_tokens = (await token12.balanceOf(owner.address)) / 10**decimals; 
+      let decimals = await token1.decimals();
+      let minted_tokens = (await token1.balanceOf(owner.address)) / 10**decimals; 
       expect(minted_tokens).to.be.equal(1000000);
       
     });
@@ -63,24 +63,24 @@ describe("DutchAuction", function () {
 
       
       // first auction has limited tokens and long enddate
-      await token12.connect(owner).approve(auctionContract.address, 200);
+      await token1.connect(owner).approve(auctionContract.address, 200);
       await auctionContract.connect(owner).createAuction(
         Math.floor(Date.now() / 1000 + 3600),
         ethers.utils.parseEther("1"),
         ethers.utils.parseEther("0.5"),
         200,
-        token12.address
+        token1.address
       );
   
       // second auction has many tokens and short enddate
-      await token12.connect(owner).transfer(addr1.address, 800);
-      await token12.connect(addr1).approve(auctionContract.address, 800);
+      await token1.connect(owner).transfer(addr1.address, 800);
+      await token1.connect(addr1).approve(auctionContract.address, 800);
       await auctionContract.connect(addr1).createAuction(
         Math.floor(Date.now() / 1000 + 1800),
         ethers.utils.parseEther("1"),
         ethers.utils.parseEther("0.5"),
         800,
-        token12.address
+        token1.address
       );
   
       
