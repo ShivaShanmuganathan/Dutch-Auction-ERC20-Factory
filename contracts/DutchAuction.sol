@@ -165,7 +165,7 @@ contract DutchAuction is Ownable{
                 address bidder = biddersList[_auctionID][i];
                 uint256 bidderTokens = reservedTokens[bidder][_auctionID];
                 uint256 amountPaid = moneyDeposited[bidder][_auctionID];
-                IERC20(tokenAddress).transfer(bidder, bidderTokens);
+                IERC20(tokenAddress).transfer(bidder, bidderTokens * 10**18);
                 reservedTokens[bidder][_auctionID] = 0;
                 uint256 refundAmt = amountPaid - (bidding_price*bidderTokens);
                 (bool token_success, ) = payable(bidder).call{value: refundAmt}("");
@@ -194,7 +194,7 @@ contract DutchAuction is Ownable{
                 address bidder = biddersList[_auctionID][i];
                 uint256 bidderTokens = reservedTokens[bidder][_auctionID];
                 uint256 amountPaid = moneyDeposited[bidder][_auctionID];
-                IERC20(tokenAddress).transfer(bidder, bidderTokens);
+                IERC20(tokenAddress).transfer(bidder, bidderTokens * 10**18);
                 reservedTokens[bidder][_auctionID] = 0;
                 uint256 refundAmt = amountPaid - (bidding_price*bidderTokens);
                 (bool token_success2, ) = payable(bidder).call{value: refundAmt}("");

@@ -29,12 +29,12 @@ const transformAuctionDetails = (auctionData) => {
 
 describe("DutchAuction", function () {
 
-  let owner, addr1, addr2;
+  let owner, addr1, addr2, addr3;
   let ownerBalance;
   
   before(async function () {
 
-    [owner, addr1, addr2] = await ethers.getSigners();          
+    [owner, addr1, addr2, addr3] = await ethers.getSigners();          
     const Token = await ethers.getContractFactory('Token', owner);
     token12 = await Token.deploy();
     decimals = await token12.decimals();
@@ -75,15 +75,15 @@ describe("DutchAuction", function () {
       );
   
       // second auction has many tokens and short enddate
-      await token12.connect(owner).transfer(addr1.address, ethers.utils.parseEther("80"));
-      await token12.connect(addr1).approve(auctionContract.address, ethers.utils.parseEther("80"));
-      await auctionContract.connect(addr1).createAuction(
-        Math.floor(Date.now() / 1000 + 1800),
-        ethers.utils.parseEther("1"),
-        ethers.utils.parseEther("0.5"),
-        80,
-        token12.address
-      );
+      // await token12.connect(owner).transfer(addr3.address, ethers.utils.parseEther("80"));
+      // await token12.connect(addr3).approve(auctionContract.address, ethers.utils.parseEther("80"));
+      // await auctionContract.connect(addr3).createAuction(
+      //   Math.floor(Date.now() / 1000 + 1800),
+      //   ethers.utils.parseEther("1"),
+      //   ethers.utils.parseEther("0.5"),
+      //   80,
+      //   token12.address
+      // );
   
       
     });
@@ -93,9 +93,9 @@ describe("DutchAuction", function () {
       let auctionStatus = transformAuctionDetails(auctionDetails).auctionComplete;  
       expect(auctionStatus).to.be.false;
 
-      let auctionDetails2 = await auctionContract.auctionDetails(2);
-      let auctionStatus2 = transformAuctionDetails(auctionDetails2).auctionComplete;  
-      expect(auctionStatus2).to.be.false;
+      // let auctionDetails2 = await auctionContract.auctionDetails(2);
+      // let auctionStatus2 = transformAuctionDetails(auctionDetails2).auctionComplete;  
+      // expect(auctionStatus2).to.be.false;
     });
 
     it("Should check auction details", async function () { 
@@ -116,21 +116,21 @@ describe("DutchAuction", function () {
       expect(result.token).to.be.equal(token12.address);
       expect(result.auctionComplete).to.be.false;
 
-      let auctionDetails2 = await auctionContract.auctionDetails(2);
-      let result2 = transformAuctionDetails(auctionDetails2);
-      console.log(result2);
-      expect(result2.endDate - result2.startDate).to.be.at.most(1800);
-      expect(result2.startPrice).to.be.equal('1.0');
-      expect(result2.biddingPrice).to.be.equal('1.0');
-      expect(result2.reservePrice).to.be.equal('0.5');
+      // let auctionDetails2 = await auctionContract.auctionDetails(2);
+      // let result2 = transformAuctionDetails(auctionDetails2);
+      // console.log(result2);
+      // expect(result2.endDate - result2.startDate).to.be.at.most(1800);
+      // expect(result2.startPrice).to.be.equal('1.0');
+      // expect(result2.biddingPrice).to.be.equal('1.0');
+      // expect(result2.reservePrice).to.be.equal('0.5');
       
       // expect(result2.totalTokens).to.be.equal(800);
       // expect(result2.remainingTokens).to.be.equal(800);
       
-      expect(result2.totalBids).to.be.equal(0);
-      expect(result2.totalAmount).to.be.equal('0.0');
-      expect(result2.token).to.be.equal(token12.address);
-      expect(result2.auctionComplete).to.be.false;
+      // expect(result2.totalBids).to.be.equal(0);
+      // expect(result2.totalAmount).to.be.equal('0.0');
+      // expect(result2.token).to.be.equal(token12.address);
+      // expect(result2.auctionComplete).to.be.false;
   
     });
 
@@ -139,8 +139,8 @@ describe("DutchAuction", function () {
       let auctionID = (await auctionContract.auctionOwner(owner.address)).toNumber();
       expect(auctionID).to.equal(1);
 
-      let auctionID2 = (await auctionContract.auctionOwner(addr1.address)).toNumber();
-      expect(auctionID2).to.equal(2);
+      // let auctionID2 = (await auctionContract.auctionOwner(addr3.address)).toNumber();
+      // expect(auctionID2).to.equal(2);
 
       let auctionID3 = (await auctionContract.auctionOwner(addr2.address)).toNumber();
       expect(auctionID3).to.equal(0);
@@ -151,8 +151,6 @@ describe("DutchAuction", function () {
     it("Should check owner & contract balance for erc20 tokens", async function () { 
       
       let contract_token_balance = (await token12.balanceOf(auctionContract.address)) / 10**decimals; 
-      // console.log(contract_token_balance);
-      // console.log(ownerBalance);
       ownerNewBalance = (await token12.balanceOf(owner.address)) / 10**decimals; 
       expect(ownerBalance - contract_token_balance).to.be.equal(ownerNewBalance);
 
@@ -220,18 +218,17 @@ describe("DutchAuction", function () {
     });
 
     it("Should create 1st bid in auction 1 with adddress 1 & check the created bid details", async function () {
+      let contract_token_balance = (await token12.balanceOf(auctionContract.address)) / 10**decimals; 
+      console.log(contract_token_balance);
       let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(1)));
-      // console.log(price);
-      let token_amount = 10;
-      let cost = (price * token_amount).toString();
-      // console.log("cost", cost);
       let requestTokens = 10;
+      let cost = (price * requestTokens).toString();
+      
       let auctionDetailsBefore = await auctionContract.auctionDetails(1);
       let auctionDataBefore = transformAuctionDetails(auctionDetailsBefore);
       let totalAmountBefore = parseFloat(auctionDataBefore.totalAmount);
       
       await auctionContract.connect(addr1).createBid(1, requestTokens, {value: ethers.utils.parseEther(cost)});
-      // await expect(auctionContract.connect(addr1).createBid(1, 10)).to.not.be.revertedWith('Auction Owner cannot make a bid');
       
       let auctionDetails = await auctionContract.auctionDetails(1);
       let auctionData = transformAuctionDetails(auctionDetails);
@@ -243,7 +240,7 @@ describe("DutchAuction", function () {
       
       expect(moneyDeposited.toString()).to.be.equal(cost);
       expect(totalTokens - 10).to.be.equal(remainingTokens);
-      expect(totalAmount - totalAmountBefore).to.be.equal(moneyDeposited);
+      expect(moneyDeposited.toFixed(5)).to.be.equal((totalAmount - totalAmountBefore).toFixed(5));
       expect(reservedTokens).to.be.equal(requestTokens);
 
       // console.log("biddingPrice",auctionData.biddingPrice);
@@ -256,39 +253,82 @@ describe("DutchAuction", function () {
 
     });
 
-    it("Should check bidIDList & biddersList details", async function () { 
+    it("Should create 2nd Bid in Auction 1 with address 2 after increasing time & check bid details", async function () { 
 
-      // console.log((await auctionContract.currentPrice(1)).toString());
-      // console.log((await auctionContract.auctionDetails(1)).biddingPrice.toString());
+      // INCREASE TIME AND MAKE BIDS
+      await ethers.provider.send('evm_increaseTime', [1800]);
+      await ethers.provider.send('evm_mine');
+
+      let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(1)));
+      let requestTokens = 10;
+      let cost = (price * requestTokens).toString();
       
+      let auctionDetailsBefore = await auctionContract.auctionDetails(1);
+      let auctionDataBefore = transformAuctionDetails(auctionDetailsBefore);
+      let totalAmountBefore = parseFloat(auctionDataBefore.totalAmount);
+      
+      await auctionContract.connect(addr2).createBid(1, requestTokens, {value: ethers.utils.parseEther(cost)});
+      
+      let auctionDetails = await auctionContract.auctionDetails(1);
+      let auctionData = transformAuctionDetails(auctionDetails);
+      let totalTokens = auctionData.totalTokens;
+      let remainingTokens = auctionData.remainingTokens;
+      let totalAmount = parseFloat(auctionData.totalAmount);
+      let reservedTokens = parseInt(await auctionContract.reservedTokens(addr2.address,1));
+      let moneyDeposited = parseFloat(ethers.utils.formatEther(await auctionContract.moneyDeposited(addr2.address,1)));
+      
+      expect(moneyDeposited.toString()).to.be.equal(cost);
+      expect(totalTokens - 20).to.be.equal(remainingTokens);
+      expect(moneyDeposited.toFixed(5)).to.be.equal((totalAmount - totalAmountBefore).toFixed(5));
+      expect(reservedTokens).to.be.equal(requestTokens);
+
+    });
+
+    it("Should check bidIDList & biddersList details", async function () { 
+     
       let bidID = (await auctionContract.bidIDList(addr1.address,1)).toNumber();
       let bidder = await auctionContract.biddersList(1,bidID);
       expect(bidder).to.be.equal(addr1.address);
 
-      // console.log(addr1.address);
-      // console.log((await auctionContract.bidIDList(addr1.address,1)).toNumber());
-      // console.log((await auctionContract.biddersList(1,bidID)));
-      
+      let bidID2 = (await auctionContract.bidIDList(addr2.address,1)).toNumber();
+      let bidder2 = await auctionContract.biddersList(1,bidID2);
+      expect(bidder2).to.be.equal(addr2.address);
 
     });
-
-    it("Should create 2nd Bid in Auction 1 with address 2 after increasing time & check bid details", async function () { 
-
-      // INCREASE TIME AND MAKE BIDS
-      // await ethers.provider.send('evm_increaseTime', [1800]);
-      // await ethers.provider.send('evm_mine');
-      
-
-    });
-    
-
-
-
 
   });
 
 
-  
+  describe("END AUCTION ()", function () { 
+
+    it("Should only be accessed by Auction Owners", async function () { 
+
+      await expect(auctionContract.connect(addr1).endAuction(1)).to.be.revertedWith('You are not the Auction Owner');
+
+    });
+
+    it("Should check if auction is live", async function () { 
+
+      expect(transformAuctionDetails(await auctionContract.connect(owner).auctionDetails(1)).auctionComplete).to.be.false;
+
+    });
+
+    it("Should end auction & check if all funds were distributed", async function () { 
+
+      await auctionContract.connect(owner).endAuction(1);
+      let contract_token_balance = (await token12.balanceOf(auctionContract.address)) / 10**decimals; 
+      let addr1_token_balance = (await token12.balanceOf(addr1.address)) / 10**decimals; 
+      let addr2_token_balance = (await token12.balanceOf(addr2.address)) / 10**decimals; 
+      console.log(contract_token_balance);
+      console.log(addr1_token_balance);
+      console.log(addr2_token_balance);
+      
+    });
+
+
+
+
+  });  
 
   
 

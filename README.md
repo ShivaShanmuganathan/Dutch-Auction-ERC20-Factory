@@ -35,6 +35,7 @@ FUNCTION TO BE TESTED:
 - END AUCTION
   - check if onlyAuctionOwners can access this function
   - check if auction is live
+  - END AUCTION
   - USE 2 AUCTIONS
     - ONE WITH NO REMAINING TOKENS 
       - check if erc20 has been transferred from smart contract
