@@ -76,7 +76,7 @@ contract DutchAuction is Ownable{
         // auctionDetails[auctionID].remainingTokens = _totalTokens;
         // auctionDetails[auctionID].token = _token;
         auctionOwner[msg.sender] = auctionID;
-        IERC20(_token).transferFrom(msg.sender, address(this), _totalTokens);
+        IERC20(_token).transferFrom(msg.sender, address(this), _totalTokens * 10**18);
         
         // auctionDetails[auctionID].token.transferFrom(msg.sender, address(this), _totalTokens);
         //transferToContract(msg.sender, _token, _totalTokens);
@@ -127,11 +127,13 @@ contract DutchAuction is Ownable{
     onlyNonAuctionOwners(_auctionID)
     {
         // Check if auction is still on-going
+        
         require(auctionDetails[_auctionID].auctionComplete == false, "Auction is over");
         require(reservedTokens[msg.sender][_auctionID] == 0, "One can only bid once");
         require(_amount <= auctionDetails[_auctionID].remainingTokens, "Auction does not have sufficient tokens");
         uint256 price = currentPrice(_auctionID);
-        require(msg.value >= price * _amount, "more money required");
+        uint tokensRequested = _amount / 10**18;
+        require(msg.value >= price * tokensRequested, "more money required");
         auctionDetails[_auctionID].biddingPrice = price;
         reservedTokens[msg.sender][_auctionID] = _amount;
         moneyDeposited[msg.sender][_auctionID] = msg.value;
@@ -201,7 +203,7 @@ contract DutchAuction is Ownable{
                 auctionDetails[_auctionID].totalAmount = auctionDetails[_auctionID].totalAmount - refundAmt;
 
             }
-            IERC20(tokenAddress).transfer(msg.sender, auctionDetails[_auctionID].remainingTokens);
+            IERC20(tokenAddress).transfer(msg.sender, auctionDetails[_auctionID].remainingTokens * 10**18);
             auctionDetails[_auctionID].remainingTokens = 0;
             uint256 ownerWithdrawBalance = auctionDetails[_auctionID].totalAmount;
             auctionDetails[_auctionID].totalAmount = 0;
