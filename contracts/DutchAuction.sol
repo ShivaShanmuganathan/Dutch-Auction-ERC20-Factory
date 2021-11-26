@@ -197,7 +197,7 @@ contract DutchAuction is Ownable{
         }
 
         else {
-            revert("AUCTION IS ON-GOING, YOU CAN END AUCTION AFTER AUCTION TIME IS OVER OR AFTER ALL TOKENS ARE SOLD");
+            revert("Auction is on-going. You can end the auction after all tokens are sold or after auction reaches end time");
         }
         
     }

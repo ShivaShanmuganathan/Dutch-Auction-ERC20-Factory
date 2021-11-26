@@ -1,15 +1,19 @@
 # Dutch Auction [Lifetime of Pot Auction]
 
-Rules of Dutch Auction
-1. Any user can start an auction by depositing an ERC20 token
-2. One user can only start one auction
-3. Any user except the auction owner can participate in the auction. Multiple users need to participate in the auction to fill the pot.
-4. One user can only bid once in each auction.
-5. If auction goes past the end time, then `buying price = reserve price`
-6. At the end of auction, the Eth collected during bidding will be refunded, if user's `buying price > end of auction price` for the ERC20 token.
-7. At the end of auction, ERC20 tokens allocated to each user during bidding is sent to their address.
-8. At the end of auction, after distributing the refund Eth to bidders, remaining Eth is sent to auction owner.
-9. End Auction can only be accessed by auction owner.
+Dutch Pot Auction
+1. Any user can start an auction by depositing an ERC20 token to the Smart Contract
+2. From a single user address, only one auction can be created.
+3. Any user except the Auction Owner can participate in the auction. Multiple users need to participate in the auction to fill the pot.
+4. In each auction, each user can only bid once.
+5. Bid = Requested Number Of Tokens * Token Price at that time
+6. The price of the erc20 token decreases linearly with time, until it reaches end time.
+7. If auction goes past the end time, then `buying price = reserve price`
+8. Auction can only be ended by Auction Owner.
+9. Auction can only be ended after all tokens are reserved or after auction reaches end time.
+10. At the end of auction, ERC20 tokens reserved to each bidder is sent to their address.
+11. At the end of auction, if `user's buying price > last bidding price` for the ERC20 token, the extra Eth collected from bidders during bidding will be refunded.
+12. At the end of auction, after distributing the refund Eth to bidders, remaining Eth is transferred to Auction Owner.
+13. At the end of auction, if there are unreserved(unsold) ERC20 tokens, these tokens are sent back to Auction Owner
    
 <br />
 
@@ -18,8 +22,8 @@ Tests Covering the Smart Contract
 - MINT TOKENS & CHECK OWNER BALANCE
 - CREATE AUCTION 
   - APPROVE TOKENS & CREATE 2 AUCTIONS
-    - first auction has limited tokens and long enddate
-    - second auction has many tokens and short enddate
+    - first auction has limited tokens and long enddate ---> it is ended before enddate, but all tokens are sold
+    - second auction has many tokens and short enddate ---> it is ended after enddate, but has unsold tokens
   - check if auction is live
   - verify auction details
   - verify auctionOwner
