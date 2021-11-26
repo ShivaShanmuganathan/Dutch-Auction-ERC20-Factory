@@ -1,9 +1,19 @@
-# Basic Sample Hardhat Project
+# Dutch Auction [Lifetime of Pot Auction]
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+Rules of Dutch Auction
+1. Any user can start an auction by depositing an ERC20 token
+2. One user can only start one auction
+3. Any user except the auction owner can participate in the auction. Multiple users need to participate in the auction to fill the pot.
+4. One user can only bid once in each auction.
+5. If auction goes past the end time, then `buying price = reserve price`
+6. At the end of auction, the Eth collected during bidding will be refunded, if user's `buying price > end of auction price` for the ERC20 token.
+7. At the end of auction, ERC20 tokens allocated to each user during bidding is sent to their address.
+8. At the end of auction, after distributing the refund Eth to bidders, remaining Eth is sent to auction owner.
+9. End Auction can only be accessed by auction owner.
+   
+<br />
 
-Try running some of the following tasks:
-FUNCTION TO BE TESTED:
+Tests Covering the Smart Contract
 
 - MINT TOKENS & CHECK OWNER BALANCE
 - CREATE AUCTION 
@@ -53,14 +63,22 @@ FUNCTION TO BE TESTED:
       - check if owner receives the balance erc20
       - check if owner receives the balance eth
       - check if auction is complete
-- CHECK TIME
 
+
+
+Instructions To Run This Repo
 ```shell
-npx hardhat accounts
+git clone https://github.com/ShivaShanmuganathan/DutchAuction.git
+```
+```shell
+npm install
+```
+```shell
+npx hardhat --version
+```
+```shell
 npx hardhat compile
-npx hardhat clean
+```
+```shell
 npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
 ```
