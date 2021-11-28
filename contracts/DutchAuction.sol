@@ -6,15 +6,26 @@ pragma solidity 0.8.0;
  * @title Owner
  * @dev Set & change owner
  */
-import "./Token.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import "hardhat/console.sol";
 
+interface IERC20 {
 
-contract DutchAuction is Ownable{
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+
+}
+
+
+contract DutchAuction {
 
     struct Auction {
+
         uint256 startDate;
         uint256 endDate;
         uint256 startPrice;
@@ -26,6 +37,7 @@ contract DutchAuction is Ownable{
         uint256 totalAmount;
         address token;
         bool auctionComplete;
+        
     }
 
     uint256 auctionID;
@@ -84,8 +96,8 @@ contract DutchAuction is Ownable{
         });
 
         auctionOwner[msg.sender] = auctionID;
-        IERC20(_token).transferFrom(msg.sender, address(this), _totalTokens * 10**18);
         
+        IERC20(_token).transferFrom(msg.sender, address(this), IERC20(_token).allowance(msg.sender, address(this)));
         emit AuctionCreated(auctionID, _totalTokens, _token);
     }
     
@@ -115,8 +127,7 @@ contract DutchAuction is Ownable{
         require(reservedTokens[msg.sender][_auctionID] == 0, "One can only bid once");
         require(_amount <= auctionDetails[_auctionID].remainingTokens, "Auction does not have sufficient tokens");
         uint256 price = currentPrice(_auctionID);
-        uint tokensRequested = _amount / 10**18;
-        require(msg.value >= price * tokensRequested, "more money required");
+        require(msg.value >= price * _amount, "more money required");
         auctionDetails[_auctionID].biddingPrice = price;
         reservedTokens[msg.sender][_auctionID] = _amount;
         moneyDeposited[msg.sender][_auctionID] = msg.value;

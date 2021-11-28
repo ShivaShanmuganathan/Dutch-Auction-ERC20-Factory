@@ -1,8 +1,6 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { assert } = require("console");
-const { BigNumber } = require("ethers");
-const { type } = require("os");
 const provider = waffle.provider;
 
 
@@ -17,7 +15,6 @@ const transformAuctionDetails = (auctionData) => {
     reservePrice: ethers.utils.formatEther(auctionData.reservePrice),
     biddingPrice: ethers.utils.formatEther(auctionData.biddingPrice),
     totalTokens: auctionData.totalTokens.toNumber(),
-    // ethers.utils.formatEther(auctionData.totalTokens),
     remainingTokens: auctionData.remainingTokens.toNumber(),
     totalBids: auctionData.totalBids.toNumber(),
     totalAmount: ethers.utils.formatEther(auctionData.totalAmount),
