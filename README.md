@@ -1,6 +1,15 @@
 # Dutch Auction [Lifetime of Pot Auction]
 
-Dutch Pot Auction
+## Dutch Pot Auction [Reverse Auction -- The price of asset decrease with time]
+
+## How Does This Auction Work?
+
+### Using this Dutch Auction Contract, anyone can create an auction and sell their ERC20 tokens.
+### A User cannot start another auction when their current auction is live
+### Everyone except the auction owner can bid in the listed auction.
+### In each auction, each user can only bid once.
+
+### Auction Explained in Detail
 1. Any user can start an auction by depositing an ERC20 token to the Smart Contract
 2. From a single user address, only one auction can be created.
 3. Any user except the Auction Owner can participate in the auction. Multiple users need to participate in the auction to fill the pot.
@@ -17,13 +26,18 @@ Dutch Pot Auction
    
 <br />
 
-Tests Covering the Smart Contract
+## Tests Covering The Dutch Auction Smart Contract [TOTAL TESTS: 49]
 
 - MINT TOKENS & CHECK OWNER BALANCE
 - CREATE AUCTION 
   - APPROVE TOKENS & CREATE 2 AUCTIONS
     - first auction has limited tokens and long enddate ---> it is ended before enddate, but all tokens are sold
     - second auction has many tokens and short enddate ---> it is ended after enddate, but has unsold tokens
+    - third auction has many tokens and long enddate ---> it is ended before enddate, but all tokens are sold
+    <br />
+    Auction 3 Is Added To Show That This Contract Can Handle Multiple Live Auctions Simultaneously.
+    <br />
+    Auction 3 Starts Along With Auction 2, This Auction Remains Live Throughout Auction 2 Lifetime. And, It Ends After All Tokens Are Sold.
   - check if auction is live
   - verify auction details
   - verify auctionOwner
@@ -39,9 +53,10 @@ Tests Covering the Smart Contract
   - check if auction is live
   - check if bidder has any previous bids
   - check if auction has sufficient tokens for bidder
-  - MAKE 4 BIDS
+  - MAKE 6 BIDS
     - make 2 bids from 2 accounts to auction 1
     - make 2 bids from 2 accounts to auction 2
+    - make 2 bids from 2 accounts to auction 3
   - check if ether transferred is greater than bidding_price * amount
   - check if auctionDetails[_auctionID].totalAmount matches 
   - check if sender address is included in biddersList using bidIDList
@@ -50,21 +65,28 @@ Tests Covering the Smart Contract
   - check if onlyAuctionOwners can access this function
   - check if auction is live
   - END AUCTION
-  - USE 2 AUCTIONS
-    - ONE WITH NO REMAINING TOKENS 
+  - 3 AUCTIONS
+    - FIRST AUCTION --> WITH NO REMAINING TOKENS AND HAS NOT REACHED ENDDATE
       - check if refund eth has been transferred from smart contract
       - check if refund eth has been transferred to respective accounts
       - check if erc20 has been transferred from smart contract
       - check if erc20 has been transferred to respective accounts
       - check if owner receives the balance eth
-      - check if auction is complete
-    - ONE WITH REMAINING TOKENS BUT PAST ENDDATE - [PRICE = RESERVE PRICE, AFTER ENDDATE]
+      - check if auction is complete <br />
+    - SECOND AUCTION --> WITH REMAINING TOKENS BUT PAST ENDDATE - [PRICE = RESERVE PRICE, AFTER ENDDATE]
       - check if auction has remaining tokens
       - check if erc20 has been transferred from smart contract
       - check if erc20 has been transferred to respective account
       - check if refund eth has been transferred from smart contract
       - check if refund eth has been transferred to respective account
       - check if owner receives the balance erc20
+      - check if owner receives the balance eth
+      - check if auction is complete
+    - THIRD AUCTION --> WITH NO REMAINING TOKENS AND HAS NOT REACHED ENDDATE
+      - check if refund eth has been transferred from smart contract
+      - check if refund eth has been transferred to respective accounts
+      - check if erc20 has been transferred from smart contract
+      - check if erc20 has been transferred to respective accounts
       - check if owner receives the balance eth
       - check if auction is complete
 
