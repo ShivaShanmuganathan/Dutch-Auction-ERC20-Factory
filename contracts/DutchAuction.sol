@@ -19,6 +19,10 @@ interface IERC20 {
     function approve(address spender, uint256 amount) external returns (bool);
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
+    // logging events
+    event Approval(address indexed _owner, address indexed _spender, uint _value);
+    event Transfer(address indexed _from, address indexed _to, uint _value);
+
 }
 
 
@@ -40,7 +44,7 @@ contract DutchAuction {
         
     }
 
-    uint256 auctionID;
+    uint256 public auctionID;
     
     // Maps userAddress to auctionID to reservedTokens;
     mapping (address => mapping (uint256 => uint256)) public reservedTokens;
@@ -83,7 +87,7 @@ contract DutchAuction {
         auctionID = auctionID + 1;
         auctionDetails[auctionID] = Auction({
             startDate: block.timestamp,
-            endDate: auctionDetails[auctionID].startDate + _endDate,
+            endDate: _endDate,
             startPrice : _startPrice,
             reservePrice : _reservePrice,
             biddingPrice : _startPrice,
@@ -94,9 +98,9 @@ contract DutchAuction {
             token : _token,
             auctionComplete: false
         });
-
-        auctionOwner[msg.sender] = auctionID;
         
+        
+        auctionOwner[msg.sender] = auctionID;
         IERC20(_token).transferFrom(msg.sender, address(this), IERC20(_token).allowance(msg.sender, address(this)));
         emit AuctionCreated(auctionID, _totalTokens, _token);
     }
