@@ -1,15 +1,15 @@
-# Dutch Auction [Lifetime of Pot Auction]
-
-## Dutch Pot Auction [Reverse Auction -- The price of asset decrease with time]
+# Dutch Pot Auction [Reverse Auction -- The price of asset decrease with time]
 
 ## How Does This Auction Work?
 
-### Using this Dutch Auction Contract, anyone can create an auction and sell their ERC20 tokens.
-### A User cannot start another auction when their current auction is live
-### Everyone except the auction owner can bid in the listed auction.
-### In each auction, each user can only bid once.
+- Using this Dutch Auction Contract, anyone can create an auction and sell their ERC20 tokens.
+- A user cannot start another auction when their current auction is live
+- The price of the listed item in the auction decreases linearly with time
+- Everyone except the auction owner can bid in the listed auction.
+- In each auction, each user can only bid once.
 
-### Auction Explained in Detail
+
+## Auction Explained in Detail
 1. Any user can start an auction by depositing an ERC20 token to the Smart Contract
 2. From a single user address, only one auction can be created.
 3. Any user except the Auction Owner can participate in the auction. Multiple users need to participate in the auction to fill the pot.
