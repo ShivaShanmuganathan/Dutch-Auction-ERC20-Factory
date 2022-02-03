@@ -1,4 +1,7 @@
 # Dutch Pot Auction [Reverse Auction -- The price of asset decrease with time]
+![Dutch Auction Algorand](https://user-images.githubusercontent.com/30176438/152404035-f2bc9c31-092f-44d9-9da9-86f7e410ac10.gif)
+
+
 
 ## How Does This Auction Work?
 
