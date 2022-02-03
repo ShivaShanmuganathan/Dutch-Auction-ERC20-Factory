@@ -1,7 +1,5 @@
 # Dutch Pot Auction [Reverse Auction -- The price of asset decrease with time]
 
-![DutchAuction Working Explained By Algorand](https://github.com/ShivaShanmuganathan/DutchAuction/blob/main/How_Dutch_Auctions_Work_-_YouTube_-_3_February_2022_AdobeCreativeCloudExpress_AdobeCreativeCloudExpress.gif)
-
 ## How Does This Auction Work?
 
 - Using this Dutch Auction Contract, anyone can create an auction and sell their ERC20 tokens.
