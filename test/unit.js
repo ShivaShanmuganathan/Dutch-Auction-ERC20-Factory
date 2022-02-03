@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { assert } = require("console");
-const { token } = require("@project-serum/anchor/dist/cjs/utils");
+// const { token } = require("@project-serum/anchor/dist/cjs/utils");
 
 const transformAuctionDetails = (auctionData) => {
   return {
@@ -42,9 +42,9 @@ describe("DutchAuction Unit Test", function () {
 
   });
 
-  describe("Minting Local Tokens", function () { 
+  describe("Check Owner Balance of local tokens", function () { 
 
-    it("Should mint tokens & check owner balance", async function () { 
+    it("check owner balance", async function () { 
       
       ownerBalance = (await token1.balanceOf(owner.address)) / 10**decimals; 
       expect(ownerBalance).to.be.equal(1000000);
@@ -119,6 +119,8 @@ describe("DutchAuction Unit Test", function () {
       
       let contractTokenBalance = (await token1.balanceOf(auctionContract.address)) / 10**decimals; 
       let ownerNewBalance = (await token1.balanceOf(owner.address)) / 10**decimals; 
+      console.log("contractTokenBalance", contractTokenBalance);
+      console.log("ownerNewBalance", ownerNewBalance);
       expect(ownerBalance - contractTokenBalance).to.be.equal(ownerNewBalance);
 
     });
@@ -155,6 +157,10 @@ describe("DutchAuction Unit Test", function () {
     it("Should create 1st bid in auction 1 with adddress 1 & check the created bid details", async function () {
       
       let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(1)));
+      console.log(parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(1))));
+      await ethers.provider.send('evm_increaseTime', [1800]);
+      await ethers.provider.send('evm_mine');
+      console.log(parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(1))));
       let requestTokens = 10;
       let cost = (price * requestTokens).toString();
       
@@ -186,6 +192,7 @@ describe("DutchAuction Unit Test", function () {
       await ethers.provider.send('evm_mine');
 
       let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(1)));
+      console.log(price);
       let requestTokens = 10;
       let cost = (price * requestTokens).toString();
       
@@ -455,6 +462,7 @@ describe("DutchAuction Unit Test", function () {
     it("Should create 1st bid in auction 3 with adddress 1 & check the created bid details", async function () {
       
       let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(3)));
+      console.log(price);
       let requestTokens = 25;
       let cost = (price * requestTokens).toString();
       
@@ -512,6 +520,7 @@ describe("DutchAuction Unit Test", function () {
     it("Should create 1st bid in auction 2 with adddress 1 & check the created bid details", async function () {
       
       let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(2)));
+      console.log(price);
       let requestTokens = 25;
       let cost = (price * requestTokens).toString();
       
@@ -543,6 +552,7 @@ describe("DutchAuction Unit Test", function () {
       await ethers.provider.send('evm_mine');
 
       let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(2)));
+      console.log(price);
       let requestTokens = 25;
       let cost = (price * requestTokens).toString();
       
@@ -611,6 +621,7 @@ describe("DutchAuction Unit Test", function () {
     it("Should create 2nd bid in auction 3 with adddress 2 & check the created bid details", async function () {
       
       let price = parseFloat(ethers.utils.formatEther(await auctionContract.currentPrice(3)));
+      console.log(price);
       let requestTokens = 75;
       let cost = (price * requestTokens).toString();
       
@@ -774,4 +785,5 @@ describe("DutchAuction Unit Test", function () {
 
   });  
 
-});
+  });
+
